@@ -65,6 +65,10 @@ public class Dequeue<T> {
             removing.next = null;
             
             size--;
+            if (isEmpty()) {
+                tail = null;
+            }
+            
             return removing.data;
         }
 
