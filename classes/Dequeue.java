@@ -32,11 +32,11 @@ public class Dequeue<T> {
      */
     public void add(T obj) {
         Node<T> newNode = new Node<T>(obj);
-        size++;
 
         if (obj == null) {
             throw new IllegalArgumentException();
         }
+
         if (isEmpty()) {
             head = newNode;
             tail = newNode;
@@ -45,6 +45,8 @@ public class Dequeue<T> {
             tail.next = newNode;
             tail = newNode;
         }
+
+        size++;
     }
 
     /**
@@ -66,6 +68,15 @@ public class Dequeue<T> {
             return removing.data;
         }
 
+    }
+
+    /**
+     * Removes every element in this queue.
+     */
+    public void clear() {
+        head = null;
+        tail = null;
+        size = 0;
     }
 
     /**
@@ -121,10 +132,28 @@ public class Dequeue<T> {
                 }
                 else {
                     curr = curr.next;
+                    index++;
                 }
             }
             return -1;
         }
+    }
+
+    @Override 
+    public String toString() {
+        String result = "{";
+        if (!isEmpty()) {
+            Node<T> curr = head;
+            while (curr != null) {
+                result = result + curr.data.toString();
+                if (curr.next != null) {
+                    result = result + ", ";
+                }
+                curr = curr.next;
+            }
+        }
+        result = result + "}";
+        return result;
     }
 
     /**
@@ -152,6 +181,7 @@ public class Dequeue<T> {
          * @param dataPortion the element to store
          * @param nextNode the node that follows this one
          */
+        @SuppressWarnings("unused")
         public Node(E dataPortion, Node<E> nextNode) {
             data = dataPortion;
             next = nextNode;
