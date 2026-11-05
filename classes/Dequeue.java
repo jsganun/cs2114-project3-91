@@ -6,6 +6,9 @@ import java.util.NoSuchElementException;
  * A first-in, first-out queue backed by a linked chain of nodes.
  *
  * @param <T> the type of elements stored in this queue
+ * 
+ * @author Jonathan Ganun (jsganun)
+ * @version 11/6/2026
  */
 public class Dequeue<T> {
     private Node<T> head;
