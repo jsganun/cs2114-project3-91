@@ -211,4 +211,32 @@ public class Attraction {
         }
         throw new UnsupportedOperationException("TODO");
     }
+
+    /**
+     * Used to simulate the logic of the attraction
+     * 
+     * @param delta the amount of time since last tick.
+     */
+    public void tick(float delta) {
+
+        // Do not process if not active
+        if (!active) {
+            return;
+        }
+
+        // Don't start the ride until there is at least half of the capacity waiting.
+        if (currDuration == 0 && visitors.size() >= capacity / 2) {
+            for (int i = 0; i < Math.min(visitors.size(), capacity); i++) {
+                visitors.remove();
+            }
+            currDuration = duration;
+            return;
+        }
+
+        // If the ride is running, start counting down the duration
+        if (currDuration > 0) {
+            currDuration = Math.clamp(currDuration - delta, 0f, duration);
+        }
+    }
+
 }
