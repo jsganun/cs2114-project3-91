@@ -104,12 +104,18 @@ public class Attraction {
      *        deactivate it
      */
     public void setActive(boolean state) {
-        active = state;
+        if (active != state) {
+            active = state;
+            if (!active) {
+                visitors.clear();
+                currDuration = 0f;
+            }
+        }
     }
 
     /**
      * Adds a visitor to the end of the line if their maximum wait time is at
-     * least the estimated wait time.
+     * least the estimated wait time and the attraction is active.
      *
      * @param visitor the visitor to add
      * @return {@code true} if the visitor was added; otherwise, {@code false}
@@ -120,6 +126,10 @@ public class Attraction {
             throw new IllegalArgumentException();
         }
         
+        if (!active) {
+            return false;
+        }
+
         if (remainingTime() > visitor.getMaxWaitTime()) {
             return false;
         }
@@ -185,7 +195,7 @@ public class Attraction {
      */
     public float remainingTime() {
         int rounds = remainingRounds();
-        if (rounds < 0) {
+        if (rounds < 1) {
             return 0;
         }
         else if (rounds == 1) {
@@ -209,7 +219,17 @@ public class Attraction {
         if (index == -1) {
             throw new NoSuchElementException();
         }
-        throw new UnsupportedOperationException("TODO");
+        
+        int rounds = remainingRounds(visitor);
+        if (rounds < 1) {
+            return 0f;
+        }
+        else if (rounds == 1) {
+            return currDuration;
+        }
+        else {
+            return currDuration + ((rounds - 1) * duration);
+        }
     }
 
     /**
@@ -226,7 +246,8 @@ public class Attraction {
 
         // Don't start the ride until there is at least half of the capacity waiting.
         if (currDuration == 0 && visitors.size() >= capacity / 2) {
-            for (int i = 0; i < Math.min(visitors.size(), capacity); i++) {
+            int loops = Math.min(visitors.size(), capacity);
+            for (int i = 0; i < loops; i++) {
                 visitors.remove();
             }
             currDuration = duration;
