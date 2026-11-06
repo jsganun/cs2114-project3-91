@@ -12,14 +12,14 @@ public class Visitor {
     }
 
     public int getId() {
-        throw new UnsupportedOperationException("TODO");
+        return id;
     }
 
     public String getName() {
-        throw new UnsupportedOperationException("TODO");
+        return name;
     }
 
     public float getMaxWaitTime() {
-        throw new UnsupportedOperationException("TODO");
+        return maxWaitTime;
     }
 }
