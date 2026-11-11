@@ -1,23 +1,25 @@
 package classes;
 
 public class Statistic {
-    private static String name;
+    private final String name;
     private float value;
 
     public Statistic(String name, float value) {
-        Statistic.name = name;
+        this.name = name;
         this.value = value;
     }
 
     public String getName() {
-        throw new UnsupportedOperationException("TODO");
+        return name;
     }
 
     public float getValue() {
-        throw new UnsupportedOperationException("TODO");
+        return value;
     }
 
-    public void setValue(float newValue) {
-        throw new UnsupportedOperationException("TODO");
+    public void setValue(float value) {
+        if (Float.isFinite(value) && value >= 0){
+            this.value = value;
+        }
     }
 }
