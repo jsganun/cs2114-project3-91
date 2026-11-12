@@ -3,9 +3,11 @@ package classes;
 import java.util.Scanner;
 
 public class ParkView {
-    private final Scanner input = new Scanner(System.in);
+    private final Scanner input;
 
-    public ParkView() {
+    public ParkView() 
+    {
+        input = new Scanner(System.in);
     }
 
     public void showOptions() {
