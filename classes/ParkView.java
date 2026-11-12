@@ -24,10 +24,19 @@ public class ParkView {
      */
     public void showOptions() 
     {
+        System.out.println();
         System.out.println("User options:");
         System.out.println("1. Show attractions");
         System.out.println("2. Show details of a specific attraction");
-        System.out.println("3. Show visitors");
+        System.out.println("3. Add an attraction");
+        System.out.println("4. Remove an attraction");
+        System.out.println("5. Open an attraction");
+        System.out.println("6. Close an attraction");
+        System.out.println("7. Open the park");
+        System.out.println("8. Close the park");
+        System.out.println("9. Add a visitor to an attraction's line");
+        System.out.println("10. Advance time");
+        System.out.println("0. Quit");
     }
     
     
@@ -45,19 +54,56 @@ public class ParkView {
             
         for(int i = 0; i < attractions.length; i++)
         {
-            System.out.println(attractions[i]);
+            Attraction attraction = attractions[i];
+            System.out.println("ID " + attraction.getId() + ": "
+                + attraction.getName() + " (" + openOrClosed(attraction)
+                + ") - " + attraction.getCapacity() + " riders per round, "
+                + attraction.getDuration() + " min ride");
         }
     }
 
-    
+
     /**
      * Shows the details of a specific attraction
-     * 
+     *
      * @param attraction what attraction to display the details for
      */
-    public void showAttractionDetails(Attraction attraction) 
+    public void showAttractionDetails(Attraction attraction)
     {
-        System.out.println(attraction);
+        if(attraction == null)
+        {
+            throw new IllegalArgumentException();
+        }
+
+        System.out.println("Attraction " + attraction.getId() + ": "
+            + attraction.getName());
+        System.out.println("  Status: " + openOrClosed(attraction));
+        System.out.println("  Capacity: " + attraction.getCapacity()
+            + " riders per round");
+        System.out.println("  Ride length: " + attraction.getDuration()
+            + " minutes");
+        System.out.println("  Time left in current round: "
+            + attraction.getCurrDuration() + " minutes");
+        System.out.println("  Wait if you join now: "
+            + attraction.remainingTime() + " minutes ("
+            + attraction.remainingRounds() + " rounds)");
+    }
+
+
+    /**
+     * gives a word describing whether an attraction is open
+     *
+     * @param attraction the attraction to describe
+     *
+     * @return String "open" if the attraction is active, "closed" if not
+     */
+    private String openOrClosed(Attraction attraction)
+    {
+        if(attraction.getActive())
+        {
+            return "open";
+        }
+        return "closed";
     }
 
     
@@ -146,18 +192,29 @@ public class ParkView {
      * 
      * @return int the entered number when completed
      */
-    public int promptIntRange(int min, int max) 
+    public int promptIntRange(int min, int max)
     {
-        System.out.println("Enter a number: ");
-        int value = input.nextInt();
-        
-        while(value < min || value > max)
+        System.out.println("Enter a number (" + min + "-" + max + "): ");
+
+        // Reads the whole line so the Enter key is never left behind for
+        // the next prompt, and so letters re-prompt instead of crashing.
+        while(true)
         {
-            System.out.println("That is not within range. Please try again:  ");
-            value = input.nextInt();
+            String line = input.nextLine().trim();
+            try
+            {
+                int value = Integer.parseInt(line);
+                if(value >= min && value <= max)
+                {
+                    return value;
+                }
+                System.out.println("That is not within range. Please try again:  ");
+            }
+            catch(NumberFormatException e)
+            {
+                System.out.println("That is not a whole number. Please try again:  ");
+            }
         }
-        
-        return value;
     }
 
     
@@ -170,17 +227,29 @@ public class ParkView {
      * 
      * @return float the entered number when completed
      */
-    public float promptFloatRange(float min, float max) 
+    public float promptFloatRange(float min, float max)
     {
-        System.out.println("Enter a number: ");
-        float value = input.nextFloat();
-        
-        while(value < min || value > max)
+        System.out.println("Enter a number (" + min + "-" + max + "): ");
+
+        // Reads the whole line so the Enter key is never left behind for
+        // the next prompt, and so letters re-prompt instead of crashing.
+        while(true)
         {
-            System.out.println("That is not within range. Please try again:  ");
-            value = input.nextFloat();
+            String line = input.nextLine().trim();
+            try
+            {
+                float value = Float.parseFloat(line);
+                // Written this way so "NaN" is rejected too.
+                if(value >= min && value <= max)
+                {
+                    return value;
+                }
+                System.out.println("That is not within range. Please try again:  ");
+            }
+            catch(NumberFormatException e)
+            {
+                System.out.println("That is not a number. Please try again:  ");
+            }
         }
-        
-        return value;
     }
 }
