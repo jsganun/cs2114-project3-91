@@ -168,6 +168,6 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 - **Jonathan:** Used Copilot to generate the class templates from the UML diagram. Used Copilot to generate `TestAttraction` and `TestDequeue`, then proofread and revised them. Used Copilot to generate the Javadocs for `Attraction` and `Dequeue`, then proofread them. Used Copilot to make a template for the attribution table.
 - **Sami:** Used Claude to plan the controller methods and their pseudocode before they were implemented. Sami decided what to build, reviewed the pseudocode, and tested it by running the program. Used Claude to help write and format the README sections listed above.
 - **Ben:** To be filled in by Ben.
-- **Katie:** To be filled in by Katie.
+- **Katie:** No GenAI used.
 
 
