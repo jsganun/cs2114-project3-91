@@ -5,9 +5,12 @@
 <ul>
     <li><b>Attraction: </b>A method that was not present in the specification for this class was <code>Tick(float)</code>. We added this method to allow the attractions to simulate time, something which we forgot to account for in specification.</li>
     <li><b>Dequeue: </b>An additional method that wasn't included in specification was <code>find(Object)</code>. We added this method to see if an object was inside of the Dequeue, and if so, its index as well.</li>
-</ul>
+    <li><b>ParkView: </b>A method that was not present in the specification for this class was <code>showMessage(String)</code>. We added this method to allow other classes to easily display messages to the user without having the rewrite the code. In our spec, we also had <code>showAttractionDetails(Attraction)</code> taking in user input, but we moved it to controller to keep the model/view boundary.</li>
+    </ul>
 
 ### Did the model really stand alone?
+The model is still able to stand alone. While the program in its entirety depends on user input to fulfill its goal, if given pre-defined attractions and parameters, it can run on its own. Since this is the case, we did not have to move anything. Everything in the model and view remain separate; only the controller acts as the bridge between the two sides.
+
 ### What happened to our unknowns?
 <ul>
     <li><b>Time Simulation: </b>We are still determining whether to let time pass passively as the program runs or if the manager should run a command to simulate time.</li>
@@ -37,7 +40,6 @@
 | Katie Smith |  |
 
 ## Attributions
-
 | Member | Contributions | AI Disclosure |
 | --- | --- | --- |
 | Jonathan Ganun | <ul><li>Created the boilerplates for all of the classes.</li><li>`Attraction` and `TestAttraction`</li><li>`Dequeue` and `TestDequeue`</li><li>Created `README` skeleton</li><li>Added what changed from specification for `Attraction` and `Dequeue`.</li><li>Added <b>Time Tests</b> and <b>IllegalArgumentExceptions</b> to the <i>"What new tests will we need?"</i> section.</li> <li>Wrote the <i>"What happened to our unknowns"</i> section.</li></ul> | <ul><li>Used Copilot to generate boilerplates based on UML diagram.</li><li>`TestAttraction` and `TestDequeue` were generated with Copilot with proofreading and revisions.</li><li>JavaDocs for `Attraction` and `Dequeue` were generated with Copilot and proofread.</li><li>Used Copilot to generate a template table for the Attributions section of the `README`.</li></ul> |
