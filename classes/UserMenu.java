@@ -220,6 +220,42 @@ public class UserMenu {
     }
 
     /**
+     * Shows the park's attractions and prompts the user for the ID of one of
+     * them. Prompts again until the ID belongs to an attraction in the park,
+     * since IDs can have gaps after an attraction is removed.
+     *
+     * @return the attraction the user selected, or {@code null} if the park
+     *         has no attractions
+     */
+    private Attraction selectAttraction() {
+        Attraction[] attractions = currentAttractions();
+        if (attractions.length == 0) {
+            view.showMessage("There are no attractions yet.");
+            return null;
+        }
+
+        view.showAttractions(attractions);
+
+        int minId = attractions[0].getId();
+        int maxId = attractions[0].getId();
+        for (Attraction attraction : attractions) {
+            minId = Math.min(minId, attraction.getId());
+            maxId = Math.max(maxId, attraction.getId());
+        }
+
+        view.showMessage("Enter the ID of the attraction:");
+        int id = view.promptIntRange(minId, maxId);
+        Attraction selected = findAttraction(id);
+        while (selected == null) {
+            view.showMessage("There is no attraction with ID " + id
+                + ". Enter one of the IDs listed above:");
+            id = view.promptIntRange(minId, maxId);
+            selected = findAttraction(id);
+        }
+        return selected;
+    }
+
+    /**
      * Returns the attractions currently in the park, without the park's empty
      * slots.
      *
@@ -257,6 +293,21 @@ public class UserMenu {
     private Attraction findAttraction(String name) {
         for (Attraction attraction : currentAttractions()) {
             if (attraction.getName().trim().equalsIgnoreCase(name.trim())) {
+                return attraction;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds the attraction with the specified ID.
+     *
+     * @param id the ID to look for
+     * @return the attraction with that ID, or {@code null} if there is none
+     */
+    private Attraction findAttraction(int id) {
+        for (Attraction attraction : currentAttractions()) {
+            if (attraction.getId() == id) {
                 return attraction;
             }
         }
