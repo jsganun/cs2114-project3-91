@@ -24,7 +24,7 @@ public class ParkView {
      */
     public void showAttractions(Attraction[] attractions)
     {
-        //this.getAttractions();
+        
     }
 
     
@@ -59,11 +59,26 @@ public class ParkView {
 
     
     /**
-     * asks the user "yes or no" to recieve confirmation
+     * asks the user "yes or no" to receive confirmation
+     * 
+     * @return boolean true/false corresponds with the user's answer (yes/no)
      */
     public boolean promptConfirmation() 
     {
-        throw new UnsupportedOperationException("TODO");
+        System.out.println("Enter yes(Y) or no(N)");
+        String response = input.nextLine();
+        
+        while(!response.equals("Y") && !response.equals("N"))
+        {
+            System.out.println("Your response must be formatted as Y or N. Please try again: ");
+            response = input.nextLine();
+        }
+        
+        if(response.equals("Y"))
+        {
+            return true;
+        }
+        return false;
     }
 
     
@@ -124,6 +139,15 @@ public class ParkView {
      */
     public float promptFloatRange(float min, float max) 
     {
-        throw new UnsupportedOperationException("TODO");
+        System.out.println("Enter a number: ");
+        float value = input.nextFloat();
+        
+        while(value < min || value > max)
+        {
+            System.out.println("That is not within range. Please try again:  ");
+            value = input.nextFloat();
+        }
+        
+        return value;
     }
 }
