@@ -10,35 +10,120 @@ public class ParkView {
         input = new Scanner(System.in);
     }
 
-    public void showOptions() {
+    /**
+     * Shows the main options the user can select
+     */
+    public void showOptions() 
+    {
+        throw new UnsupportedOperationException("TODO");
+    }
+    
+    
+    /**
+     * Shows the list of attractions that are currently in the park
+     */
+    public void showAttractions(Attraction[] attractions)
+    {
+        //this.getAttractions();
+    }
+
+    
+    /**
+     * Shows the details of a given attraction. 
+     * User is instructed to enter the ID of the ride
+     * 
+     * @param attraction what attraction to display the details for
+     */
+    public void showAttractionDetails(Attraction attraction) 
+    {
         throw new UnsupportedOperationException("TODO");
     }
 
-    public void showAttractionDetails(Attraction attraction) {
+    
+    /**
+     * Shows the list of visitors that are currently in the park
+     */
+    public void showVisitors(Visitor[] visitors) 
+    {
         throw new UnsupportedOperationException("TODO");
     }
 
-    public void showVisitors(Visitor[] visitors) {
+    
+    /**
+     * 
+     */
+    public void showMessage(String message) 
+    {
         throw new UnsupportedOperationException("TODO");
     }
 
-    public void showMessage(String message) {
+    
+    /**
+     * asks the user "yes or no" to recieve confirmation
+     */
+    public boolean promptConfirmation() 
+    {
         throw new UnsupportedOperationException("TODO");
     }
 
-    public boolean promptConfirmation() {
-        throw new UnsupportedOperationException("TODO");
+    
+    /**
+     * creates a string prompt
+     * 
+     * @param chars character limit
+     * 
+     * @return String the entered letters as a String
+     */
+    public String promptString(int chars) 
+    {
+        System.out.println("Enter your message: ");
+        String string = input.nextLine();
+        
+        while(string.length() > chars )
+        {
+            System.out.println("That exceeds the character limit. Please try again: ");
+            string = input.nextLine();
+        }
+        
+        return string;
     }
 
-    public String promptString(int chars) {
-        throw new UnsupportedOperationException("TODO");
+    
+    /**
+     * establishes whether a given integer is within range
+     * 
+     * @param min low end of the range
+     * 
+     * @param max high end of the range
+     * 
+     * @return int the entered number when completed
+     */
+    public int promptIntRange(int min, int max) 
+    {
+        System.out.println("Enter a number: ");
+        int value = input.nextInt();
+        
+        while(value < min || value > max)
+        {
+            System.out.println("That is not within range. Please try again:  ");
+            value = input.nextInt();
+        }
+        
+        return value;
     }
 
-    public int promptIntRange(int min, int max) {
-        throw new UnsupportedOperationException("TODO");
-    }
-
-    public float promptFloatRange(float min, float max) {
+    
+    /**
+     * establishes whether a given float is within range
+     * 
+     * @param min low end of range
+     * 
+     * @param max high end of range
+     * 
+     * @return float the entered number when completed
+     */
+    public float promptFloatRange(float min, float max) 
+    {
         throw new UnsupportedOperationException("TODO");
     }
 }
