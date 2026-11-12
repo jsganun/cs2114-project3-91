@@ -5,12 +5,19 @@ public class Visitor {
     private final int id;
     private final String name;
     private final float maxWaitTime;
+    private final boolean fastPass;
 
     public Visitor(String name, float maxWaitTime) {
-        id = nextId++;
+        this(name, maxWaitTime, false);
+    }
+
+    public Visitor(String name, float maxWaitTime, boolean fastPass) {
+        this.id = nextId++;
         this.name = name;
         this.maxWaitTime = maxWaitTime;
+        this.fastPass = fastPass;
     }
+
     public int getId() {
         return id;
     }
@@ -18,9 +25,15 @@ public class Visitor {
     public String getName() {
         return name;
     }
+
     public float getMaxWaitTime() {
         return maxWaitTime;
     }
+
+    public boolean getFastPass() {
+        return fastPass;
+    }
+
     @Override 
     public boolean equals(Object obj){
         if (obj == this){
