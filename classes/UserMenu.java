@@ -23,6 +23,14 @@ public class UserMenu {
     private static final int ADD_VISITOR = 9;
     private static final int ADVANCE_TIME = 10;
 
+    // Limits for new attractions. These match the checks in
+    // Park.addAttraction(); use Park's constants instead once it has them.
+    private static final int MAX_NAME_LENGTH = 30;
+    private static final int MIN_CAPACITY = 1;
+    private static final int MAX_CAPACITY = 100;
+    private static final float MIN_DURATION = 0.1f;
+    private static final float MAX_DURATION = 1000f;
+
     private final Park park;
     private final ParkView view;
 
@@ -53,7 +61,7 @@ public class UserMenu {
             view.showOptions();
             choice = view.promptIntRange(QUIT, ADVANCE_TIME);
             handleChoice(choice);
-        } 
+        }
         while (choice != QUIT);
     }
 
@@ -80,10 +88,17 @@ public class UserMenu {
     }
 
     /**
-     * Shows every attraction currently in the park.
+     * Shows every attraction currently in the park, or a message if the park
+     * has none.
      */
     private void showAttractions() {
-        notImplemented("View attractions");
+        Attraction[] attractions = currentAttractions();
+        if (attractions.length == 0) {
+            view.showMessage("There are no attractions yet.");
+        }
+        else {
+            view.showAttractions(attractions);
+        }
     }
 
     /**
@@ -95,10 +110,35 @@ public class UserMenu {
 
     /**
      * Prompts the user for a name, capacity, and ride duration, then adds a
-     * new attraction with those values to the park.
+     * new attraction with those values to the park. If the park already has
+     * the maximum number of attractions, the user is told so and nothing is
+     * prompted.
      */
     private void addAttraction() {
-        notImplemented("Add attraction");
+        if (currentAttractions().length >= Park.MAX_ATTRACTIONS) {
+            view.showMessage("The park already has the maximum of "
+                + Park.MAX_ATTRACTIONS + " attractions.");
+            return;
+        }
+
+        String name = promptAttractionName();
+
+        view.showMessage("Enter the capacity (" + MIN_CAPACITY + "-"
+            + MAX_CAPACITY + " riders per round):");
+        int capacity = view.promptIntRange(MIN_CAPACITY, MAX_CAPACITY);
+
+        view.showMessage("Enter the ride duration in minutes (" + MIN_DURATION
+            + "-" + MAX_DURATION + "):");
+        float duration = view.promptFloatRange(MIN_DURATION, MAX_DURATION);
+
+        if (park.addAttraction(name, capacity, duration)) {
+            Attraction added = findAttraction(name);
+            view.showMessage("Added " + added.getName() + " (ID "
+                + added.getId() + ").");
+        }
+        else {
+            view.showMessage("Could not add " + name + ".");
+        }
     }
 
     /**
@@ -151,6 +191,76 @@ public class UserMenu {
      */
     private void advanceTime() {
         notImplemented("Advance time");
+    }
+
+    /**
+     * Prompts the user for a new attraction's name until they enter one that
+     * is not blank and is not already used by another attraction.
+     *
+     * @return the name the user entered, with surrounding spaces removed
+     */
+    private String promptAttractionName() {
+        view.showMessage("Enter the attraction's name (up to "
+            + MAX_NAME_LENGTH + " characters):");
+        String name = view.promptString(MAX_NAME_LENGTH).trim();
+
+        // Park does not reject duplicate names yet, so the menu checks here.
+        while (name.isEmpty() || findAttraction(name) != null) {
+            if (name.isEmpty()) {
+                view.showMessage("The name cannot be blank. Try again:");
+            }
+            else {
+                view.showMessage("An attraction named "
+                    + findAttraction(name).getName()
+                    + " already exists. Enter a different name:");
+            }
+            name = view.promptString(MAX_NAME_LENGTH).trim();
+        }
+        return name;
+    }
+
+    /**
+     * Returns the attractions currently in the park, without the park's empty
+     * slots.
+     *
+     * @return an array holding only the park's attractions; empty if the park
+     *         has none
+     */
+    private Attraction[] currentAttractions() {
+        Attraction[] slots = park.getAttractions();
+
+        int count = 0;
+        for (Attraction attraction : slots) {
+            if (attraction != null) {
+                count++;
+            }
+        }
+
+        Attraction[] attractions = new Attraction[count];
+        int index = 0;
+        for (Attraction attraction : slots) {
+            if (attraction != null) {
+                attractions[index] = attraction;
+                index++;
+            }
+        }
+        return attractions;
+    }
+
+    /**
+     * Finds the attraction with the specified name, ignoring case and
+     * surrounding spaces.
+     *
+     * @param name the name to look for
+     * @return the attraction with that name, or {@code null} if there is none
+     */
+    private Attraction findAttraction(String name) {
+        for (Attraction attraction : currentAttractions()) {
+            if (attraction.getName().trim().equalsIgnoreCase(name.trim())) {
+                return attraction;
+            }
+        }
+        return null;
     }
 
     /**
