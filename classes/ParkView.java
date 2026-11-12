@@ -146,12 +146,13 @@ public class ParkView {
     public boolean promptConfirmation() 
     {
         System.out.println("Enter yes(Y) or no(N)");
-        String response = input.nextLine();
-        
+        // Accepts lowercase too, so "y" and "n" work
+        String response = input.nextLine().trim().toUpperCase();
+
         while(!response.equals("Y") && !response.equals("N"))
         {
             System.out.println("Your response must be formatted as Y or N. Please try again: ");
-            response = input.nextLine();
+            response = input.nextLine().trim().toUpperCase();
         }
         
         if(response.equals("Y"))

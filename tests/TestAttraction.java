@@ -153,6 +153,24 @@ public class TestAttraction {
     }
 
     @Test
+    public void testRemainingTimeWhenIdle() {
+        Attraction idle = new Attraction("Idle", 2, 5.0f);
+        idle.setActive(true);
+        Visitor[] line = new Visitor[5];
+        for (int i = 0; i < line.length; i++) {
+            line[i] = new Visitor("V" + i, 60.0f);
+            assertTrue(idle.addVisitor(line[i]));
+        }
+
+        // Nothing is running, so 0 and 1 board first, then 2 and 3 after one
+        // full round, then 4 after two full rounds.
+        assertEquals(0.0f, idle.remainingTime(line[0]));
+        assertEquals(5.0f, idle.remainingTime(line[2]));
+        assertEquals(10.0f, idle.remainingTime(line[4]));
+        assertEquals(10.0f, idle.remainingTime());
+    }
+
+    @Test
     public void testTick() {
         
         Exception exception = null;

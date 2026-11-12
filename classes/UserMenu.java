@@ -23,13 +23,22 @@ public class UserMenu {
     private static final int ADD_VISITOR = 9;
     private static final int ADVANCE_TIME = 10;
 
-    // Limits for new attractions. These match the checks in
-    // Park.addAttraction(); use Park's constants instead once it has them.
+    // Limits for new attractions and visitors. These match the checks in
+    // Park.addAttraction() and Park.addVisitor(); use Park's constants
+    // instead once it has them.
     private static final int MAX_NAME_LENGTH = 30;
     private static final int MIN_CAPACITY = 1;
     private static final int MAX_CAPACITY = 100;
     private static final float MIN_DURATION = 0.1f;
     private static final float MAX_DURATION = 1000f;
+    private static final float MIN_WAIT_LIMIT = 0.1f;
+    private static final float MAX_WAIT_LIMIT = 1000f;
+
+    // Limits for advancing time, in minutes. Time passes in steps of
+    // TIME_STEP because Attraction.tick() boards riders at most once per call.
+    private static final float MIN_ADVANCE = 0.1f;
+    private static final float MAX_ADVANCE = 60f;
+    private static final float TIME_STEP = 1f;
 
     private final Park park;
     private final ParkView view;
@@ -168,47 +177,189 @@ public class UserMenu {
 
     /**
      * Opens an attraction the user selects by ID so visitors can join its
-     * line.
+     * line. If the attraction is already open, the user is told so.
      */
     private void openAttraction() {
-        notImplemented("Open attraction");
+        Attraction attraction = selectAttraction();
+        if (attraction == null) {
+            return;
+        }
+
+        if (attraction.getActive()) {
+            view.showMessage(attraction.getName() + " is already open.");
+        }
+        else {
+            attraction.setActive(true);
+            view.showMessage(attraction.getName() + " is now open.");
+        }
     }
 
     /**
-     * Closes an attraction the user selects by ID, which clears its line.
+     * Closes an attraction the user selects by ID, which clears its line. If
+     * people are waiting, the user must confirm first. If the attraction is
+     * already closed, the user is told so.
      */
     private void closeAttraction() {
-        notImplemented("Close attraction");
+        Attraction attraction = selectAttraction();
+        if (attraction == null) {
+            return;
+        }
+
+        if (!attraction.getActive()) {
+            view.showMessage(attraction.getName() + " is already closed.");
+            return;
+        }
+
+        int waiting = attraction.getLineSize();
+        if (waiting > 0) {
+            view.showMessage("Closing " + attraction.getName()
+                + " sends away the " + waiting
+                + " people in its line. Close it?");
+            if (!view.promptConfirmation()) {
+                view.showMessage("Cancelled. " + attraction.getName()
+                    + " is still open.");
+                return;
+            }
+        }
+
+        attraction.setActive(false);
+        view.showMessage(attraction.getName() + " is now closed.");
     }
 
     /**
-     * Opens the park after the user confirms.
+     * Opens the park after the user confirms, so visitors can be added. If
+     * the park is already open, the user is told so.
      */
     private void openPark() {
-        notImplemented("Open park");
+        if (park.getActive()) {
+            view.showMessage("The park is already open.");
+            return;
+        }
+
+        view.showMessage("Open the park?");
+        if (view.promptConfirmation()) {
+            park.setActive(true);
+            view.showMessage("The park is now open. Visitors can be added.");
+        }
+        else {
+            view.showMessage("Cancelled. The park is still closed.");
+        }
     }
 
     /**
-     * Closes the park after the user confirms.
+     * Closes the park after the user confirms, so no new visitors can be
+     * added. Attractions keep running for the people already in line. If the
+     * park is already closed, the user is told so.
      */
     private void closePark() {
-        notImplemented("Close park");
+        if (!park.getActive()) {
+            view.showMessage("The park is already closed.");
+            return;
+        }
+
+        view.showMessage("Close the park?");
+        if (view.promptConfirmation()) {
+            park.setActive(false);
+            view.showMessage("The park is now closed. No new visitors can be "
+                + "added.");
+        }
+        else {
+            view.showMessage("Cancelled. The park is still open.");
+        }
     }
 
     /**
-     * Adds a new visitor to the park and places them in the line of an
-     * attraction the user selects by ID.
+     * Adds a new visitor to the park and places them in the line of an open
+     * attraction the user selects by ID. Tells the user how many rounds and
+     * minutes the visitor will wait, or why they did not join the line.
      */
     private void addVisitor() {
-        notImplemented("Add visitor");
+        if (!park.getActive()) {
+            view.showMessage("The park is closed. Open the park before adding "
+                + "visitors.");
+            return;
+        }
+
+        Attraction attraction = selectAttraction();
+        if (attraction == null) {
+            return;
+        }
+
+        if (!attraction.getActive()) {
+            view.showMessage(attraction.getName() + " is closed. Open it "
+                + "before adding visitors to its line.");
+            return;
+        }
+
+        view.showMessage("Enter the visitor's name (up to " + MAX_NAME_LENGTH
+            + " characters):");
+        String name = view.promptString(MAX_NAME_LENGTH).trim();
+        while (name.isEmpty()) {
+            view.showMessage("The name cannot be blank. Try again:");
+            name = view.promptString(MAX_NAME_LENGTH).trim();
+        }
+
+        view.showMessage("Enter the longest " + name + " will wait, in minutes ("
+            + MIN_WAIT_LIMIT + "-" + MAX_WAIT_LIMIT + "):");
+        float maxWait = view.promptFloatRange(MIN_WAIT_LIMIT, MAX_WAIT_LIMIT);
+
+        if (!park.addVisitor(name, maxWait)) {
+            view.showMessage("Could not add " + name + ". The park is full ("
+                + Park.MAX_VISITORS + " visitors).");
+            return;
+        }
+
+        Visitor visitor = newestVisitor();
+        if (attraction.addVisitor(visitor)) {
+            view.showMessage(name + " joined the line for "
+                + attraction.getName() + ". Rounds until boarding: "
+                + attraction.remainingRounds(visitor) + ". Estimated wait: "
+                + attraction.remainingTime(visitor) + " minutes.");
+        }
+        else {
+            view.showMessage(name + " entered the park but did not join the "
+                + "line. The wait for " + attraction.getName() + " is "
+                + attraction.remainingTime() + " minutes, which is longer than "
+                + maxWait + " minutes.");
+        }
     }
 
     /**
-     * Advances the simulation by an amount of time the user enters, letting
-     * each attraction board visitors and run its rounds.
+     * Advances the simulation by a number of minutes the user enters. Every
+     * attraction runs its rounds and boards visitors as time passes, then the
+     * user is shown how each line changed.
      */
     private void advanceTime() {
-        notImplemented("Advance time");
+        Attraction[] attractions = currentAttractions();
+        if (attractions.length == 0) {
+            view.showMessage("There are no attractions yet.");
+            return;
+        }
+
+        view.showMessage("How many minutes should pass? (" + MIN_ADVANCE + "-"
+            + MAX_ADVANCE + "):");
+        float minutes = view.promptFloatRange(MIN_ADVANCE, MAX_ADVANCE);
+
+        int[] waitingBefore = new int[attractions.length];
+        for (int i = 0; i < attractions.length; i++) {
+            waitingBefore[i] = attractions[i].getLineSize();
+        }
+
+        float remaining = minutes;
+        while (remaining > 0) {
+            float step = Math.min(TIME_STEP, remaining);
+            for (Attraction attraction : attractions) {
+                attraction.tick(step);
+            }
+            remaining -= step;
+        }
+
+        view.showMessage(minutes + " minutes passed.");
+        for (int i = 0; i < attractions.length; i++) {
+            view.showMessage("  " + attractions[i].getName() + ": "
+                + waitingBefore[i] + " -> " + attractions[i].getLineSize()
+                + " people waiting");
+        }
     }
 
     /**
@@ -333,11 +484,19 @@ public class UserMenu {
     }
 
     /**
-     * Tells the user that the specified option has not been built yet.
+     * Returns the visitor most recently added to the park. Park.addVisitor()
+     * does not return the visitor it creates, but it fills the first empty
+     * slot, so the newest visitor is the last one in the park's array.
      *
-     * @param option the name of the option
+     * @return the newest visitor, or {@code null} if the park has none
      */
-    private void notImplemented(String option) {
-        view.showMessage(option + " is not implemented yet.");
+    private Visitor newestVisitor() {
+        Visitor[] visitors = park.getVisitors();
+        for (int i = visitors.length - 1; i >= 0; i--) {
+            if (visitors[i] != null) {
+                return visitors[i];
+            }
+        }
+        return null;
     }
 }

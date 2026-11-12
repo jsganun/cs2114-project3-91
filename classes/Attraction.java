@@ -204,11 +204,10 @@ public class Attraction {
      */
     public float remainingTime() {
         int rounds = remainingRounds();
-        if (rounds < 1) {
-            return 0;
-        }
-        else if (rounds == 1) {
-            return currDuration;
+        // When the ride is idle, none of the rounds ahead has started yet, so
+        // each one takes a full duration.
+        if (currDuration == 0) {
+            return rounds * duration;
         }
         else {
             return currDuration + ((rounds - 1) * duration);
@@ -230,11 +229,10 @@ public class Attraction {
         }
         
         int rounds = remainingRounds(visitor);
-        if (rounds < 1) {
-            return 0f;
-        }
-        else if (rounds == 1) {
-            return currDuration;
+        // When the ride is idle, none of the rounds ahead has started yet, so
+        // each one takes a full duration.
+        if (currDuration == 0) {
+            return rounds * duration;
         }
         else {
             return currDuration + ((rounds - 1) * duration);
