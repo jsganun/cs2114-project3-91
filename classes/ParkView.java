@@ -82,6 +82,7 @@ public class ParkView {
             + " riders per round");
         System.out.println("  Ride length: " + attraction.getDuration()
             + " minutes");
+        System.out.println("  People waiting: " + attraction.getLineSize());
         System.out.println("  Time left in current round: "
             + attraction.getCurrDuration() + " minutes");
         System.out.println("  Wait if you join now: "

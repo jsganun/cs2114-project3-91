@@ -105,7 +105,10 @@ public class UserMenu {
      * Shows the details of an attraction the user selects by ID.
      */
     private void showAttractionDetails() {
-        notImplemented("Attraction details");
+        Attraction attraction = selectAttraction();
+        if (attraction != null) {
+            view.showAttractionDetails(attraction);
+        }
     }
 
     /**
@@ -145,7 +148,22 @@ public class UserMenu {
      * Removes an attraction the user selects by ID after the user confirms.
      */
     private void removeAttraction() {
-        notImplemented("Remove attraction");
+        Attraction attraction = selectAttraction();
+        if (attraction == null) {
+            return;
+        }
+
+        view.showMessage("Remove " + attraction.getName() + "?");
+        if (!view.promptConfirmation()) {
+            view.showMessage("Cancelled. " + attraction.getName()
+                + " was not removed.");
+        }
+        else if (park.removeAttraction(attraction.getId())) {
+            view.showMessage("Removed " + attraction.getName() + ".");
+        }
+        else {
+            view.showMessage("Could not remove " + attraction.getName() + ".");
+        }
     }
 
     /**

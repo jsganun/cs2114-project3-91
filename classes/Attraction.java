@@ -98,6 +98,15 @@ public class Attraction {
     }
 
     /**
+     * Returns the number of visitors waiting in this attraction's line.
+     *
+     * @return the number of visitors in line
+     */
+    public int getLineSize() {
+        return visitors.size();
+    }
+
+    /**
      * Sets whether this attraction is active.
      *
      * @param state {@code true} to activate this attraction; {@code false} to

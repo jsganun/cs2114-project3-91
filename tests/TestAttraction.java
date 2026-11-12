@@ -78,6 +78,14 @@ public class TestAttraction {
     }
 
     @Test
+    public void testGetLineSize() {
+        assertEquals(5, attraction.getLineSize());
+        attraction.removeVisitor();
+        assertEquals(4, attraction.getLineSize());
+        assertEquals(0, new Attraction("Empty", 10, 5.0f).getLineSize());
+    }
+
+    @Test
     public void testSetActive() {
         assertTrue(attraction.getActive());
         attraction.setActive(false);
