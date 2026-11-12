@@ -236,8 +236,14 @@ public class Attraction {
      * Used to simulate the logic of the attraction
      * 
      * @param delta the amount of time since last tick.
+     * @throws IllegalArgumentException if the passed delta < 0
      */
     public void tick(float delta) {
+
+        // Throw an error if delta isn't greater or equal to 0
+        if (delta < 0f) {
+            throw new IllegalArgumentException("Delta must be not be a negative number");
+        }
 
         // Do not process if not active
         if (!active) {

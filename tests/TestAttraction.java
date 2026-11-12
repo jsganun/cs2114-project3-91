@@ -146,6 +146,17 @@ public class TestAttraction {
 
     @Test
     public void testTick() {
+        
+        Exception exception = null;
+        try {
+            attraction.tick(-1f);
+        } 
+        catch (Exception e) {
+            exception = e;
+        }
+        assertNotNull(exception);
+        assertTrue(exception instanceof IllegalArgumentException);
+
         attraction.tick(1.0f);
         assertEquals(5.0f, attraction.getCurrDuration());
         assertTrue(attraction.getVisitors().isEmpty());
