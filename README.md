@@ -5,7 +5,8 @@
 <ul>
     <li><b>Attraction: </b>A method that was not present in the specification for this class was <code>Tick(float)</code>. We added this method to allow the attractions to simulate time, something which we forgot to account for in specification.</li>
     <li><b>Dequeue: </b>An additional method that wasn't included in specification was <code>find(Object)</code>. We added this method to see if an object was inside of the Dequeue, and if so, its index as well.</li>
-</ul>
+    <li><b>ParkView: </b>A method that was not present in the specification for this class was <code>showMessage(String)</code>. We added this method to allow other classes to easily display messages to the user without having the rewrite the code. In our spec, we also had <code>showAttractionDetails(Attraction)</code> taking in user input, but we moved it to controller to keep the model/view boundary.</li>
+    </ul>
 
 ### Did the model really stand alone?
 ### What happened to our unknowns?
