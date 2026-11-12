@@ -2,9 +2,18 @@ package classes;
 
 import java.util.Scanner;
 
+/**
+ *  Displays to and take information from the user regarding the park
+ * 
+ *  @author Katie Smith (ksmith08)
+ *  @version Nov 12, 2026
+ */
 public class ParkView {
     private final Scanner input;
 
+    /**
+     * instantiates the scanner to take in user input
+     */
     public ParkView() 
     {
         input = new Scanner(System.in);
@@ -15,46 +24,70 @@ public class ParkView {
      */
     public void showOptions() 
     {
-        throw new UnsupportedOperationException("TODO");
+        System.out.println("User options:");
+        System.out.println("1. Show attractions");
+        System.out.println("2. Show details of a specific attraction");
+        System.out.println("3. Show visitors");
     }
     
     
     /**
      * Shows the list of attractions that are currently in the park
+     * 
+     * @param attractions array of attractions that are in the park
      */
     public void showAttractions(Attraction[] attractions)
     {
-        
+        if(attractions == null)
+        {
+            throw new IllegalArgumentException();
+        }
+            
+        for(int i = 0; i < attractions.length; i++)
+        {
+            System.out.println(attractions[i]);
+        }
     }
 
     
     /**
-     * Shows the details of a given attraction. 
-     * User is instructed to enter the ID of the ride
+     * Shows the details of a specific attraction
      * 
      * @param attraction what attraction to display the details for
      */
     public void showAttractionDetails(Attraction attraction) 
     {
-        throw new UnsupportedOperationException("TODO");
+        System.out.println(attraction);
     }
 
     
     /**
      * Shows the list of visitors that are currently in the park
+     * 
+     * @param visitors array of visitors that are in the park
      */
     public void showVisitors(Visitor[] visitors) 
     {
-        throw new UnsupportedOperationException("TODO");
+        if(visitors == null)
+        {
+            throw new IllegalArgumentException();
+        }
+        
+        for(int i = 0; i < visitors.length; i++)
+        {
+            System.out.println(visitors[i]);
+        }
     }
 
     
     /**
+     * displays a message to the user
      * 
+     * @param message the message to be displayed
      */
     public void showMessage(String message) 
     {
-        throw new UnsupportedOperationException("TODO");
+        System.out.println(message);
     }
 
     
