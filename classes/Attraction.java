@@ -8,6 +8,13 @@ import java.util.NoSuchElementException;
  * @version 11/5/2026
  */
 public class Attraction {
+
+    // Fast Visitors : Normal Visitors to board ride
+    private static final int FAST_TO_NORMAL_RATIO = 3;
+
+    // Capacity / MIN_CAPACITY_TO_BEGIN = Visitors required to start a round
+    private static final int MIN_CAPACITY_TO_BEGIN = 2;
+
     private static int currId = 0;
 
     private final int id;
@@ -273,4 +280,106 @@ public class Attraction {
         }
     }
 
+    /**
+     * Calculates how many from both the regular and fast line can board a round
+     * 
+     * @param regularSize the size of the regular line
+     * @param fastSize the size of the fast line
+     * @return [regular, fast pass] visitors that should board the attraction
+     */
+    private int[] getBoardingCounts(int regularSize, int fastSize) {
+
+        // Case: Total visitors waiting <= capacity
+        if (regularSize + fastSize <= capacity) {
+            return new int[] {regularSize, fastSize};
+        }
+
+        // Calculate the required amount of regulars and fasts to maintain ratio
+        int requiredRegulars = capacity / (FAST_TO_NORMAL_RATIO + 1);
+        int requiredFasts = (capacity * FAST_TO_NORMAL_RATIO) / (FAST_TO_NORMAL_RATIO + 1);
+
+        // Add an extra required fast if both don't add up due to integer math
+        if (requiredRegulars + requiredFasts < capacity) {
+            requiredFasts++;
+        }
+
+        // Case: Not enough regulars to fill ratio
+        if (regularSize < requiredRegulars) {
+            return new int[] {regularSize, capacity - regularSize};
+        }
+
+        // Case: Not enough fasts to fill ratio
+        if (fastSize < requiredFasts) {
+            return new int[] {capacity - fastSize, fastSize};
+        }
+
+        // Case: Enough of regulars and fasts to fill ratio
+        return new int[] {requiredRegulars, requiredFasts};
+    }
+
+    /**
+     * Calculates how many rounds it will take before a visitor at a position can board
+     * 
+     * @param pos the position of the visitor
+     * @param fast does the visitor have a fast pass
+     * @param regularSize the size of the regular line
+     * @param fastSize the size of the fast pass line
+     * @return the number of rounds the visitor will need to wait to board
+     */
+    private int remainingRoundsFromPosition(
+        int pos, 
+        boolean fast, 
+        int regularSize, 
+        int fastSize
+    ) 
+    {
+        // Case: Total Visitors <= Capacity
+        if (regularSize + fastSize <= capacity) {
+            if (currDuration == 0f) {
+                return 0;
+            }
+            else {
+                return 1;
+            }
+        }
+
+        // Case: Total Visitors > Capacity
+        int rounds = currDuration > 0 ? 1 : 0;
+
+        while (true) {
+            int[] boarding = getBoardingCounts(regularSize, fastSize);
+            int boardingAmount = boarding[fast ? 1 : 0];
+            if (pos < boardingAmount) {
+                return rounds;
+            }
+
+            pos -= boardingAmount;
+            regularSize -= boarding[0];
+            fastSize -= boarding[1];
+            rounds++;
+        }
+    }
+
+    /**
+     * Calculates how much time it will take before a visitor at a position can board
+     * 
+     * @param pos the position of the visitor
+     * @param fast does the visitor have a fast pass
+     * @param regularSize the size of the regular line
+     * @param fastSize the size of the fast pass line
+     * @return the amount of time the visitor must wait before boarding
+     */
+    private float remainingTimeFromPosition(
+        int pos, 
+        boolean fast, 
+        int regularSize, 
+        int fastSize
+    )
+    {
+        int rounds = remainingRoundsFromPosition(pos, fast, regularSize, fastSize);
+        if (currDuration > 0) {
+            return currDuration + (rounds - 1) * duration;
+        }
+        return rounds * duration;
+    }
 }
