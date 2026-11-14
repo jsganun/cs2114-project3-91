@@ -1,12 +1,11 @@
 package classes;
 
-import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
  * Represents an attraction at a theme park.
  * @author Jonathan Ganun (jsganun)
- * @version 11/5/2026
+ * @version 11/14/2026
  */
 public class Attraction {
 
@@ -280,7 +279,7 @@ public class Attraction {
 
         // Don't start the ride until there is at least half of the capacity waiting.
         int total = visitors.size() + fastVisitors.size();
-        if (currDuration == 0 && total >= capacity / 2) {
+        if (currDuration == 0 && total >= capacity / MIN_CAPACITY_TO_BEGIN) {
             int[] boards = getBoardingCounts(visitors.size(), fastVisitors.size());
             for (int i = 0; i < boards[0]; i++) {
                 visitors.remove();    
