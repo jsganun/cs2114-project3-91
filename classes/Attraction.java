@@ -1,5 +1,6 @@
 package classes;
 
+import java.util.Deque;
 import java.util.NoSuchElementException;
 
 /**
@@ -24,6 +25,7 @@ public class Attraction {
     private final float duration;
     private float currDuration;
     private final Dequeue<Visitor> visitors = new Dequeue<>();
+    private final Dequeue<Visitor> fastVisitors = new Dequeue<>();
 
     /**
      * Creates an attraction with a unique ID and the specified name, capacity,
@@ -100,8 +102,8 @@ public class Attraction {
      *
      * @return this attraction's visitor line
      */
-    public Dequeue<Visitor> getVisitors() {
-        return visitors;
+    public Dequeue<Visitor> getVisitors(boolean fast) {
+        return fast ? fastVisitors : visitors;
     }
 
     /**
@@ -109,8 +111,8 @@ public class Attraction {
      *
      * @return the number of visitors in line
      */
-    public int getLineSize() {
-        return visitors.size();
+    public int getLineSize(boolean fast) {
+        return fast ? fastVisitors.size() : visitors.size();
     }
 
     /**
@@ -124,6 +126,7 @@ public class Attraction {
             active = state;
             if (!active) {
                 visitors.clear();
+                fastVisitors.clear();
                 currDuration = 0f;
             }
         }
@@ -146,11 +149,11 @@ public class Attraction {
             return false;
         }
 
-        if (remainingTime() > visitor.getMaxWaitTime()) {
+        if (remainingTime(visitor.getFastPass()) > visitor.getMaxWaitTime()) {
             return false;
         }
         else {
-            visitors.add(visitor);
+            getVisitors(visitor.getFastPass()).add(visitor);
             return true;
         }
     }
@@ -158,26 +161,29 @@ public class Attraction {
     /**
      * Removes and returns the visitor at the front of the line.
      *
+     * @param fast which line to remove a visitor from
      * @return the visitor removed from the front of the line
      * @throws NoSuchElementException if the line is empty
      */
-    public Visitor removeVisitor() {
-        return visitors.remove();
+    public Visitor removeVisitor(boolean fast) {
+        return getVisitors(fast).remove();
     }
 
     /**
      * Estimates the number of rounds remaining for a hypothetical visitor
      * positioned at the very end of the line.
      *
+     * @param fast does the hypothetical visitor have a fast pass?
      * @return the estimated number of rounds before that visitor is served
      */
-    public int remainingRounds() {
-        if (currDuration == 0) {
-            return visitors.size() / capacity;
-        }
-        else {
-            return (visitors.size() / capacity) + 1;
-        }
+    public int remainingRounds(boolean fast) {
+        int pos = getLineSize(fast);
+        int regularSize = getLineSize(false);
+        int fastSize = getLineSize(true);
+        if (fast) fastSize++;
+        else regularSize++;
+
+        return remainingRoundsFromPosition(pos, fast, regularSize, fastSize);
     }
 
     /**
@@ -186,39 +192,43 @@ public class Attraction {
      *
      * @param visitor the visitor whose position to estimate
      * @return the estimated number of rounds before the visitor is served
+     * @throws IllegalArgumentException if the visitor is null
      * @throws NoSuchElementException if the visitor is not in this attraction's
      *         line
      */
     public int remainingRounds(Visitor visitor) {
-        int index = visitors.find(visitor);
+        if (visitor == null) {
+            throw new IllegalArgumentException("Visitor cannot be null");
+        }
+
+        int index = getVisitors(visitor.getFastPass()).find(visitor);
         if (index == -1) {
             throw new NoSuchElementException();
         }
 
-        if (currDuration == 0) {
-            return index / capacity;
-        }
-        else {
-            return (index / capacity) + 1;
-        }
+        return remainingRoundsFromPosition(
+            index, 
+            visitor.getFastPass(), 
+            getLineSize(false), 
+            getLineSize(true)
+        );
     }
 
     /**
      * Estimates the remaining wait time for a hypothetical visitor positioned
      * at the very end of the line.
      *
+     * @param fast does the hypothetical visitor have a fast pass?
      * @return the estimated wait time
      */
-    public float remainingTime() {
-        int rounds = remainingRounds();
-        // When the ride is idle, none of the rounds ahead has started yet, so
-        // each one takes a full duration.
-        if (currDuration == 0) {
-            return rounds * duration;
-        }
-        else {
-            return currDuration + ((rounds - 1) * duration);
-        }
+    public float remainingTime(boolean fast) {
+        int pos = getLineSize(fast);
+        int regularSize = getLineSize(false);
+        int fastSize = getLineSize(true);
+        if (fast) fastSize++;
+        else regularSize++;
+
+        return remainingTimeFromPosition(pos, fast, regularSize, fastSize);
     }
 
     /**
@@ -226,24 +236,28 @@ public class Attraction {
      *
      * @param visitor the visitor whose wait time to estimate
      * @return the estimated wait time
+     * @throws IllegalArgumentException if the visitor is null
      * @throws NoSuchElementException if the visitor is not in this attraction's
      *         line
      */
     public float remainingTime(Visitor visitor) {
-        int index = visitors.find(visitor);
-        if (index == -1) {
+        if (visitor == null) {
+            throw new IllegalArgumentException("Visitor cannot be null");
+        }
+
+        int pos = getVisitors(visitor.getFastPass()).find(visitor);
+        int regularSize = getLineSize(false);
+        int fastSize = getLineSize(true);
+        if (pos == -1) {
             throw new NoSuchElementException();
         }
         
-        int rounds = remainingRounds(visitor);
-        // When the ride is idle, none of the rounds ahead has started yet, so
-        // each one takes a full duration.
-        if (currDuration == 0) {
-            return rounds * duration;
-        }
-        else {
-            return currDuration + ((rounds - 1) * duration);
-        }
+        return remainingTimeFromPosition(
+            pos, 
+            visitor.getFastPass(), 
+            regularSize, 
+            fastSize
+        );
     }
 
     /**
@@ -265,13 +279,16 @@ public class Attraction {
         }
 
         // Don't start the ride until there is at least half of the capacity waiting.
-        if (currDuration == 0 && visitors.size() >= capacity / 2) {
-            int loops = Math.min(visitors.size(), capacity);
-            for (int i = 0; i < loops; i++) {
-                visitors.remove();
+        int total = visitors.size() + fastVisitors.size();
+        if (currDuration == 0 && total >= capacity / 2) {
+            int[] boards = getBoardingCounts(visitors.size(), fastVisitors.size());
+            for (int i = 0; i < boards[0]; i++) {
+                visitors.remove();    
+            }
+            for (int i = 0; i < boards[1]; i++) {
+                fastVisitors.remove();    
             }
             currDuration = duration;
-            return;
         }
 
         // If the ride is running, start counting down the duration
