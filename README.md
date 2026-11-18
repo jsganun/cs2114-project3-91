@@ -38,7 +38,7 @@ java -cp out classes.Main
 
 
 
-### What changed from our specification?
+### What changed from our specification? (D3)
 
 - **Attraction:** A method that was not present in the specification for this class was `Tick(float)`. We added this method to allow the attractions to simulate time, something which we forgot to account for in specification.
 - **Dequeue:** An additional method that wasn't included in specification was `find(Object)`. We added this method to see if an object was inside of the Dequeue, and if so, its index as well.
@@ -51,7 +51,7 @@ java -cp out classes.Main
 
 
 
-### Did the model really stand alone?
+### Did the model really stand alone? (D3)
 
 Mostly. The model classes do not know about the view or the controller, and all of the model tests run without them. The view never changes the model. Only the controller does.
 
@@ -64,7 +64,7 @@ A few rules did end up in the controller instead of the model, because the model
 
 Also, `Attraction.getVisitors()` still returns the real line, so any class that calls it could change the line. We added `getLineSize()` so the view does not need it.
 
-### What happened to our unknowns?
+### What happened to our unknowns? (D3)
 
 - **Time Simulation:** Figured out. The manager lets time pass with the "Advance time" menu option, and each ride moves forward one minute at a time. We chose this over a real clock because the screen only changes when the user picks an option, and a clock running in the background would print in the middle of the menu.
 - **Calculating Wait Times:** We figured this out by implementing a `find` method into `Dequeue` that allows us to find the position of a visitor. We then used their position to figure out how many rounds it will take before they can board the ride. We then used that number to calculate time using the time of the current round and future rounds.
@@ -73,7 +73,7 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 
 
 
-### What doesn't work yet?
+### What doesn't work yet? (D3)
 
 - Visitors do not leave the line when their maximum wait runs out. They only check the wait once, when they try to join. Our revised scope said they would leave.
 - The wait estimate ignores the rule that a ride only starts when at least half of its seats would be filled. A visitor can be told "0 minutes" and then wait until more people join.
@@ -82,13 +82,23 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 - `TestParkView` is empty and there is no `TestUserMenu`.
 - There is no menu option to show visitors, and the `Statistic` class is not used yet.
 
+### How did your design absorb the change? (D4)
+The main way that the change to add a fast-pass lane to the attractions was done through the `Attraction` class. The `Attraction` class is responsible for managing the queues for itself, meaning it was the most reasonable place to put logic for the fast-pass lane.
 
+The `Visitor` class also partially absorbed the change. To determine if a visitor had a fast pass, a boolean attribute had to be added to assist with this. As a result, the constructor for the class now includes a parameter to indicate if the visitor has a fast pass or not.
+
+### Did the change cross the model/view line? (D4)
+The implementation of the fast pass queue sent ripples throughout the entire project, and all for a good reason. The model must computate a new type of visitor, a fast pass visitor, and therefore, must also computate a new queue for attractions. Since a new type of visitor can be made, the controllers had to now include in additional check to create a visitor with a fast pass or not. The view must show information about both fast pass visitors and the fast pass queues in attractions.
+
+### What changed from your D3 plan? (D4)
+
+### What doesn't work yet? (D4)
 
 ## Next Steps
 
 
 
-### What is left to finish the MVP
+### What is left to finish the MVP (D3)
 
 1. Make visitors leave the line when their max wait runs out.
 2. Make the wait estimate match the boarding rule.
@@ -97,7 +107,7 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 
 
 
-### Our change feature
+### Our change feature (D3)
 
 **Fast pass lane:** A second line at each ride for fast pass holders. Each round fills a set share of seats from the fast pass line first, then the rest from the regular line.
 
@@ -111,7 +121,7 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 
 
 
-### What stretch goals we will attempt?
+### What stretch goals we will attempt? (D3)
 
 - **Attempting:** fast pass (it's the change feature) and ride statistics (the `Statistic` class is already built for this).
 - **Dropping:** visitor groups. That's still an open unknown, and it breaks first-in-first-out order.
@@ -119,7 +129,7 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 
 
 
-### What new tests will we need?
+### What new tests will we need? (D3)
 
 - **Time Tests:** Now that time is an element in our program, we have to make sure that the classes continue to work as time passes.
 - **IllegalArgumentExceptions:** Most of the newly added methods from the specification document are public, meaning we have to make sure that they do not accept any values that may break the program.
@@ -130,7 +140,7 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 
 
 
-### Who does what?
+### Who does what? (D3)
 
 
 | Member           | Task                                                                                                          |
@@ -140,28 +150,37 @@ Also, `Attraction.getVisitors()` still returns the real line, so any class that 
 | Sami Saleh       | The UserMenu options for fast pass and statistics, `TestUserMenu`, and Main                                   |
 | Katie Smith      | ParkView display for both lines and statistics, and `TestParkView`                                            |
 
+### What is left for the final build? (D4)
 
+
+### Which stretch goals are you committing to, and which are you dropping? (D4)
+
+
+### What will your 3-minute demo show? (D4)
+
+
+### Who does what? (D4)
 
 
 ## Attributions
 
 | File | Who worked on it and how |
 | --- | --- |
-| `Attraction` | Jonathan: wrote it, including `tick()` for time (GenAI-assisted).<br>Sami: revised it by adding `getLineSize()` and fixing the wait time when a ride is not running (GenAI-assisted). |
-| `Dequeue` (and its `Node` class) | Jonathan: wrote it and fixed its bugs (GenAI-assisted). |
-| `Park` | Jonathan: made the starting template (GenAI-assisted).<br>Ben: wrote it. |
-| `Visitor` | Jonathan: made the starting template (GenAI-assisted) and wrote the getters.<br>Ben: revised it and added `equals()`. |
-| `Statistic` | Jonathan: made the starting template (GenAI-assisted).<br>Ben: wrote it. |
-| `ParkView` | Jonathan: made the starting template (GenAI-assisted).<br>Katie: wrote it, including the display and prompt methods.<br>Sami: revised the menu numbers, the attraction display, and the number prompts, and made yes/no accept lowercase (GenAI-assisted). |
-| `UserMenu` | Jonathan: made the starting template (GenAI-assisted).<br>Sami: wrote the menu loop and all 10 menu options, and tested them by running the program (GenAI-assisted). |
-| `Main` | Jonathan: made the starting template (GenAI-assisted).<br>Sami: finished and documented it (GenAI-assisted). |
-| `TestAttraction` | Jonathan: wrote it (GenAI-assisted).<br>Sami: added two tests (GenAI-assisted). |
-| `TestDequeue` | Jonathan: wrote it (GenAI-assisted). |
-| `TestPark` | Ben: wrote it.<br>Jonathan: fixed typos and JUnit usage. |
-| `TestVisitor` | Ben: wrote it.<br>Jonathan: fixed typos and JUnit usage. |
-| `TestStatistic` | Ben: wrote it.<br>Jonathan: fixed typos and JUnit usage. |
-| `TestParkView` | Katie: created it. It has no tests yet. |
-| `README.md` | Jonathan: made the skeleton and wrote what changed for `Attraction` and `Dequeue`, the unknowns, whether the model stood alone, and the first two new tests.<br>Katie: wrote what changed for `ParkView`.<br>Sami: wrote How to Run and added to the Reflection and Next Steps sections (GenAI-assisted). |
+| `Attraction` | **Jonathan:** wrote it, including `tick()` for time (GenAI-assisted). Implemented the fast-pass queue stretch feature.<br>**Sami:** revised it by adding `getLineSize()` and fixing the wait time when a ride is not running (GenAI-assisted).|
+| `Dequeue` (and its `Node` class) | **Jonathan:** wrote it and fixed its bugs (GenAI-assisted). |
+| `Park` | **Jonathan:** made the starting template (GenAI-assisted).<br>**Ben:** wrote it. |
+| `Visitor` | **Jonathan:** made the starting template (GenAI-assisted) and wrote the getters. Added an attribute, constructor, and getter for determining if a visitor has a fast pass.<br>**Ben:** revised it and added `equals()`. |
+| `Statistic` | **Jonathan:** made the starting template (GenAI-assisted).<br>**Ben:** wrote it. |
+| `ParkView` | **Jonathan:** made the starting template (GenAI-assisted).<br>**Katie:** wrote it, including the display and prompt methods.<br>**Sami:** revised the menu numbers, the attraction display, and the number prompts, and made yes/no accept lowercase (GenAI-assisted). |
+| `UserMenu` | **Jonathan:** made the starting template (GenAI-assisted).<br>**Sami:** wrote the menu loop and all 10 menu options, and tested them by running the program (GenAI-assisted). |
+| `Main` | **Jonathan:** made the starting template (GenAI-assisted).<br>**Sami:** finished and documented it (GenAI-assisted). |
+| `TestAttraction` | **Jonathan:** wrote it (GenAI-assisted). Added addtional tests for the fast pass queue. <br>**Sami:** added two tests (GenAI-assisted). |
+| `TestDequeue` | **Jonathan:** wrote it (GenAI-assisted). |
+| `TestPark` | **Ben:** wrote it.<br>**Jonathan:** fixed typos and JUnit usage. |
+| `TestVisitor` | **Ben:** wrote it.<br>**Jonathan:** fixed typos and JUnit usage. |
+| `TestStatistic` | **Ben:** wrote it.<br>**Jonathan:** fixed typos and JUnit usage. |
+| `TestParkView` | **Katie:** created it. It has no tests yet. |
+| `README.md` | **Jonathan:** made the skeleton and wrote what changed for `Attraction` and `Dequeue`, the unknowns, whether the model stood alone, and the first two new tests. Wrote *How did your design absorb the change?* and *Did the change cross model/view lines?* sections.<br>**Katie:** wrote what changed for `ParkView`.<br>**Sami:** wrote How to Run and added to the Reflection and Next Steps sections (GenAI-assisted). |
 
 ### GenAI Note
 
