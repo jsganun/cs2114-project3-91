@@ -33,8 +33,21 @@ public class Attraction {
      * @param name the attraction name
      * @param capacity the number of visitors served in each round
      * @param duration the duration of one round
+     * @throws IllegalArgumentException if {@code name} is blank,
+     *         {@code capacity} is not positive, or {@code duration} is not a
+     *         positive number
      */
     public Attraction(String name, int capacity, float duration) {
+        if (name == null || name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be blank");
+        }
+        if (capacity <= 0) {
+            throw new IllegalArgumentException("Capacity must be positive");
+        }
+        if (!Float.isFinite(duration) || duration <= 0f) {
+            throw new IllegalArgumentException("Duration must be positive");
+        }
+
         id = currId++;
         this.name = name;
         this.capacity = capacity;

@@ -122,8 +122,13 @@ public class Dequeue<T> {
      * @param obj the object to find
      * @return the zero-based index of the first matching element, or {@code -1}
      *         if no matching element is found
+     * @throws IllegalArgumentException if {@code obj} is {@code null}
      */
     public int find(T obj) {
+        if (obj == null) {
+            throw new IllegalArgumentException();
+        }
+
         if (isEmpty()) {
             return -1;
         }

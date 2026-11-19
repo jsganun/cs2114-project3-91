@@ -25,13 +25,42 @@ public class Park {
         return visitors.clone();
     }
 
-    public void setActive(boolean state) {
+    /**
+     * Opens or closes the park.
+     *
+     * @param state {@code true} to open the park; {@code false} to close it
+     * @return {@code true} if the park changed state; {@code false} if it was
+     *         already open or closed
+     */
+    public boolean setActive(boolean state) {
+        if (active == state){
+            return false;
+        }
         active = state;
+        return true;
     }
 
+    /**
+     * Adds an attraction to the park. The attraction is not added if the name
+     * is blank or already used (ignoring case), the capacity is not between 1
+     * and 100, the duration is not between 0 and 1000 minutes, or the park is
+     * full.
+     *
+     * @param name the attraction's name
+     * @param capacity the number of riders per round
+     * @param duration the length of one round, in minutes
+     * @return {@code true} if the attraction was added; otherwise,
+     *         {@code false}
+     */
     public boolean addAttraction(String name, int capacity, float duration) {
         if (name == null || name.trim().isEmpty()){
             return false;
+        }
+        for (int i = 0; i < attractions.length; i++){
+            if (attractions[i] != null
+                && attractions[i].getName().trim().equalsIgnoreCase(name.trim())){
+                return false;
+            }
         }
         if (capacity <= 0 || capacity > 100){
             return false;

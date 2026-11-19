@@ -30,11 +30,20 @@ public class TestPark {
     }
 
     @Test 
-    public void testSetActive(){ 
-        park.setActive(true);
+    public void testSetActive(){
+        assertTrue(park.setActive(true));
         assertTrue(park.getActive());
-        park.setActive(false);
+        assertTrue(park.setActive(false));
         assertFalse(park.getActive());
+    }
+
+    @Test
+    public void testSetActiveSameState(){
+        assertFalse(park.setActive(false));
+        assertFalse(park.getActive());
+        park.setActive(true);
+        assertFalse(park.setActive(true));
+        assertTrue(park.getActive());
     }
     
     @Test 
@@ -51,6 +60,14 @@ public class TestPark {
         assertFalse(park.addAttraction("Farris Wheel", 20, -10.0f));
         assertFalse(park.addAttraction("Farris Wheel", 20, Float.NaN));
         assertFalse(park.addAttraction("Farris Wheel", 20, Float.POSITIVE_INFINITY));
+    }
+
+    @Test
+    public void testAddAttractionDuplicate(){
+        assertTrue(park.addAttraction("Farris Wheel", 20, 10.0f));
+        assertFalse(park.addAttraction("Farris Wheel", 10, 5.0f));
+        assertFalse(park.addAttraction(" farris wheel ", 10, 5.0f));
+        assertNull(park.getAttractions()[1]);
     }
 
     @Test

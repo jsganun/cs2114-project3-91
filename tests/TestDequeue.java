@@ -102,6 +102,25 @@ public class TestDequeue {
         assertEquals(4, dequeue.find("E"));
         assertEquals(-1, dequeue.find("missing"));
         assertEquals(-1, blank.find("missing"));
+        assertThrows(IllegalArgumentException.class, () -> dequeue.find(null));
+    }
+
+    @Test
+    public void testInterleavedAddAndRemove() {
+        blank.add("A");
+        blank.add("B");
+        assertEquals("A", blank.remove());
+        blank.add("C");
+        assertEquals("B", blank.remove());
+        blank.add("D");
+        assertEquals("C", blank.remove());
+        assertEquals("D", blank.remove());
+        assertTrue(blank.isEmpty());
+
+        // Adding after the queue empties still works
+        blank.add("E");
+        assertEquals("E", blank.peek());
+        assertEquals(1, blank.size());
     }
 
     @Test

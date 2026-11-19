@@ -82,12 +82,18 @@ public class ParkView {
             + " riders per round");
         System.out.println("  Ride length: " + attraction.getDuration()
             + " minutes");
-        System.out.println("  People waiting: " + attraction.getLineSize());
+        System.out.println("  Regular line: " + attraction.getLineSize(false)
+            + " waiting");
+        System.out.println("  Fast pass line: " + attraction.getLineSize(true)
+            + " waiting");
         System.out.println("  Time left in current round: "
             + attraction.getCurrDuration() + " minutes");
-        System.out.println("  Wait if you join now: "
-            + attraction.remainingTime() + " minutes ("
-            + attraction.remainingRounds() + " rounds)");
+        System.out.println("  Wait if you join the regular line now: "
+            + attraction.remainingTime(false) + " minutes ("
+            + attraction.remainingRounds(false) + " rounds)");
+        System.out.println("  Wait if you join the fast pass line now: "
+            + attraction.remainingTime(true) + " minutes ("
+            + attraction.remainingRounds(true) + " rounds)");
     }
 
 

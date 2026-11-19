@@ -50,6 +50,15 @@ public class TestAttraction {
     }
 
     @Test
+    public void testConstructorInvalid() {
+        assertThrows(IllegalArgumentException.class, () -> new Attraction(null, 10, 5.0f));
+        assertThrows(IllegalArgumentException.class, () -> new Attraction(" ", 10, 5.0f));
+        assertThrows(IllegalArgumentException.class, () -> new Attraction("Ride", 0, 5.0f));
+        assertThrows(IllegalArgumentException.class, () -> new Attraction("Ride", 10, 0f));
+        assertThrows(IllegalArgumentException.class, () -> new Attraction("Ride", 10, Float.NaN));
+    }
+
+    @Test
     public void testGetId() {
         Attraction attraction1 = new Attraction("Another", 10, 5.0f);
         Attraction attraction2 = new Attraction("Another", 10, 5.0f);
@@ -120,6 +129,13 @@ public class TestAttraction {
     @Test
     public void testSetActive() {
         assertTrue(attraction.getActive());
+
+        // Test opening an attraction that is already open keeps its lines
+        attraction.setActive(true);
+        assertTrue(attraction.getActive());
+        assertEquals(5, attraction.getLineSize(false));
+        assertEquals(5, attraction.getLineSize(true));
+
         attraction.setActive(false);
         assertFalse(attraction.getActive());
         assertTrue(attraction.getVisitors(false).isEmpty());
