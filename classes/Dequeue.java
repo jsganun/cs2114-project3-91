@@ -243,7 +243,7 @@ public class Dequeue<T> implements Iterable<T> {
                 throw new NoSuchElementException();
             }
 
-            if (lastReturned != null) {
+            if (lastReturned != null && canRemove) {
                 previousNode = lastReturned;
             }
 
