@@ -1,5 +1,6 @@
 package classes;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -290,6 +291,9 @@ public class Attraction {
             return;
         }
 
+        removeTimedOutVisitors(false);
+        removeTimedOutVisitors(true);
+
         // Don't start the ride until there is at least half of the capacity waiting.
         int total = visitors.size() + fastVisitors.size();
         if (currDuration == 0 && total >= Math.max(1, capacity / MIN_CAPACITY_TO_BEGIN)) {
@@ -306,6 +310,23 @@ public class Attraction {
         // If the ride is running, start counting down the duration
         if (currDuration > 0) {
             currDuration = Math.clamp(currDuration - delta, 0f, duration);
+        }
+    }
+
+    /**
+     * Removes visitors whose maximum wait time is shorter than their
+     * estimated wait time.
+     *
+     * @param fast {@code true} to clean the fast-pass line; otherwise, the
+     *        regular line
+     */
+    private void removeTimedOutVisitors(boolean fast) {
+        Iterator<Visitor> iterator = getVisitors(fast).iterator();
+        while (iterator.hasNext()) {
+            Visitor visitor = iterator.next();
+            if (visitor.getMaxWaitTime() < remainingTime(visitor)) {
+                iterator.remove();
+            }
         }
     }
 
