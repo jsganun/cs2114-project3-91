@@ -292,7 +292,7 @@ public class Attraction {
 
         // Don't start the ride until there is at least half of the capacity waiting.
         int total = visitors.size() + fastVisitors.size();
-        if (currDuration == 0 && total >= capacity / MIN_CAPACITY_TO_BEGIN) {
+        if (currDuration == 0 && total >= Math.max(1, capacity / MIN_CAPACITY_TO_BEGIN)) {
             int[] boards = getBoardingCounts(visitors.size(), fastVisitors.size());
             for (int i = 0; i < boards[0]; i++) {
                 visitors.remove();    
