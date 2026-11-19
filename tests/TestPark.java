@@ -92,6 +92,18 @@ public class TestPark {
     }
 
     @Test
+    public void testAddVisitorFastPass(){
+        assertTrue(park.addVisitor("Mike", 30.0f, true));
+        assertTrue(park.getVisitors()[0].getFastPass());
+        assertTrue(park.addVisitor("Gary", 30.0f, false));
+        assertFalse(park.getVisitors()[1].getFastPass());
+        assertTrue(park.addVisitor("Sam", 30.0f));
+        assertFalse(park.getVisitors()[2].getFastPass());
+        assertFalse(park.addVisitor(null, 30.0f, true));
+        assertFalse(park.addVisitor("Mike", -10.0f, true));
+    }
+
+    @Test
     public void testAddVisitorMax(){
         for (int i = 0; i < Park.MAX_VISITORS; i++){
             assertTrue(park.addVisitor("Gary "+ i, 10.0f));

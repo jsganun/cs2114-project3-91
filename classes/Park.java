@@ -66,14 +66,35 @@ public class Park {
         return false;
     }
 
+    /**
+     * Adds a visitor without a fast pass to the park.
+     *
+     * @param name the visitor's name
+     * @param maxWaitTime the longest the visitor will wait, in minutes
+     * @return {@code true} if the visitor was added; otherwise, {@code false}
+     */
     public boolean addVisitor(String name, float maxWaitTime) {
+        return addVisitor(name, maxWaitTime, false);
+    }
+
+    /**
+     * Adds a visitor to the park. The visitor is not added if the name is
+     * blank, the maximum wait time is not between 0 and 1000 minutes, or the
+     * park is full.
+     *
+     * @param name the visitor's name
+     * @param maxWaitTime the longest the visitor will wait, in minutes
+     * @param fastPass {@code true} if the visitor has a fast pass
+     * @return {@code true} if the visitor was added; otherwise, {@code false}
+     */
+    public boolean addVisitor(String name, float maxWaitTime, boolean fastPass) {
         if (name == null || name.trim().isEmpty()){
             return false;
         }
         if (!Float.isFinite(maxWaitTime) || maxWaitTime <= 0 || maxWaitTime > 1000){
             return false;
         }
-        Visitor meep = new Visitor(name, maxWaitTime);
+        Visitor meep = new Visitor(name, maxWaitTime, fastPass);
         for (int i = 0; i < visitors.length; i++){
             if (visitors[i] == null){
                 visitors[i] = meep;

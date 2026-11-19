@@ -7,7 +7,7 @@ package classes;
  * display.
  *
  * @author Sami Saleh
- * @version 11/12/2026
+ * @version 11/19/2026
  */
 public class UserMenu {
     // Menu option numbers. ParkView.showOptions() must list the same numbers.
@@ -210,7 +210,8 @@ public class UserMenu {
             return;
         }
 
-        int waiting = attraction.getLineSize();
+        int waiting = attraction.getLineSize(false)
+            + attraction.getLineSize(true);
         if (waiting > 0) {
             view.showMessage("Closing " + attraction.getName()
                 + " sends away the " + waiting
@@ -270,8 +271,10 @@ public class UserMenu {
 
     /**
      * Adds a new visitor to the park and places them in the line of an open
-     * attraction the user selects by ID. Tells the user how many rounds and
-     * minutes the visitor will wait, or why they did not join the line.
+     * attraction the user selects by ID. Visitors with a fast pass join the
+     * fast pass line; everyone else joins the regular line. Tells the user how
+     * many rounds and minutes the visitor will wait, or why they did not join
+     * the line.
      */
     private void addVisitor() {
         if (!park.getActive()) {
@@ -303,31 +306,36 @@ public class UserMenu {
             + MIN_WAIT_LIMIT + "-" + MAX_WAIT_LIMIT + "):");
         float maxWait = view.promptFloatRange(MIN_WAIT_LIMIT, MAX_WAIT_LIMIT);
 
-        if (!park.addVisitor(name, maxWait)) {
+        view.showMessage("Does " + name + " have a fast pass?");
+        boolean fastPass = view.promptConfirmation();
+
+        if (!park.addVisitor(name, maxWait, fastPass)) {
             view.showMessage("Could not add " + name + ". The park is full ("
                 + Park.MAX_VISITORS + " visitors).");
             return;
         }
 
+        String line = fastPass ? "fast pass line" : "regular line";
         Visitor visitor = newestVisitor();
         if (attraction.addVisitor(visitor)) {
-            view.showMessage(name + " joined the line for "
+            view.showMessage(name + " joined the " + line + " for "
                 + attraction.getName() + ". Rounds until boarding: "
                 + attraction.remainingRounds(visitor) + ". Estimated wait: "
                 + attraction.remainingTime(visitor) + " minutes.");
         }
         else {
             view.showMessage(name + " entered the park but did not join the "
-                + "line. The wait for " + attraction.getName() + " is "
-                + attraction.remainingTime() + " minutes, which is longer than "
-                + maxWait + " minutes.");
+                + line + ". The wait for " + attraction.getName() + " is "
+                + attraction.remainingTime(fastPass) + " minutes, which is "
+                + "longer than " + maxWait + " minutes.");
         }
     }
 
     /**
      * Advances the simulation by a number of minutes the user enters. Every
      * attraction runs its rounds and boards visitors as time passes, then the
-     * user is shown how each line changed.
+     * user is shown how the regular and fast pass lines at each attraction
+     * changed.
      */
     private void advanceTime() {
         Attraction[] attractions = currentAttractions();
@@ -340,9 +348,11 @@ public class UserMenu {
             + MAX_ADVANCE + "):");
         float minutes = view.promptFloatRange(MIN_ADVANCE, MAX_ADVANCE);
 
-        int[] waitingBefore = new int[attractions.length];
+        int[] regularBefore = new int[attractions.length];
+        int[] fastBefore = new int[attractions.length];
         for (int i = 0; i < attractions.length; i++) {
-            waitingBefore[i] = attractions[i].getLineSize();
+            regularBefore[i] = attractions[i].getLineSize(false);
+            fastBefore[i] = attractions[i].getLineSize(true);
         }
 
         float remaining = minutes;
@@ -356,9 +366,10 @@ public class UserMenu {
 
         view.showMessage(minutes + " minutes passed.");
         for (int i = 0; i < attractions.length; i++) {
-            view.showMessage("  " + attractions[i].getName() + ": "
-                + waitingBefore[i] + " -> " + attractions[i].getLineSize()
-                + " people waiting");
+            view.showMessage("  " + attractions[i].getName()
+                + ": regular line " + regularBefore[i] + " -> "
+                + attractions[i].getLineSize(false) + ", fast pass line "
+                + fastBefore[i] + " -> " + attractions[i].getLineSize(true));
         }
     }
 
