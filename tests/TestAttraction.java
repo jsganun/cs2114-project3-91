@@ -19,6 +19,7 @@ import java.util.NoSuchElementException;
 public class TestAttraction {
 
     private Attraction attraction;
+    private Attraction singleAttraction;
     private Attraction emptyAttraction;
     private Visitor normalVisitor;
     private Visitor fastVisitor;
@@ -29,6 +30,8 @@ public class TestAttraction {
     public void setUp() {
         attraction = new Attraction("Test Attraction", 10, 5.0f);
         attraction.setActive(true);
+        singleAttraction = new Attraction("Single Attraction", 1, 5.0f);
+        singleAttraction.setActive(true);
         emptyAttraction = new Attraction("Test Empty Attraction", 10, 5.0f);
         emptyAttraction.setActive(true);
 
@@ -386,5 +389,12 @@ public class TestAttraction {
         // Test tick waits for minimum visitors
         attraction.tick(1.0f);
         assertEquals(0f, attraction.getCurrDuration());
+
+        // Test edge case of attraction accepting a single visitor
+        singleAttraction.tick(3f);
+        assertEquals(0f, singleAttraction.getCurrDuration());
+        singleAttraction.addVisitor(normalVisitor);
+        singleAttraction.tick(3f);
+        assertEquals(2.0f, singleAttraction.getCurrDuration());
     }
 }
