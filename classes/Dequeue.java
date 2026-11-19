@@ -124,7 +124,7 @@ public class Dequeue<T> implements Iterable<T> {
      */
     @Override
     public Iterator<T> iterator() {
-        return new DequeueIterator<T>(head);
+        return new DequeueIterator<T>(this);
     }
 
     /**
@@ -217,14 +217,19 @@ public class Dequeue<T> implements Iterable<T> {
         implements Iterator<E> {
 
         private Node<E> nextNode;
+        private Node<E> previousNode;
+        private Node<E> lastReturned;
+        private Dequeue<E> dequeue;
+        private boolean canRemove;
 
         /**
-         * Creates an iterator beginning at the specified node.
+         * Creates an iterator over the specified queue.
          *
-         * @param head the first node to visit
+         * @param queue the queue to iterate over
          */
-        public DequeueIterator(Node<E> head) {
-            nextNode = head;
+        public DequeueIterator(Dequeue<E> queue) {
+            dequeue = queue;
+            nextNode = queue.head;
         }
 
         @Override
@@ -238,9 +243,42 @@ public class Dequeue<T> implements Iterable<T> {
                 throw new NoSuchElementException();
             }
 
-            E data = nextNode.data;
+            if (lastReturned != null) {
+                previousNode = lastReturned;
+            }
+
+            lastReturned = nextNode;
             nextNode = nextNode.next;
-            return data;
+            canRemove = true;
+            return lastReturned.data;
+        }
+
+        @Override
+        public void remove() {
+            if (!canRemove) {
+                throw new IllegalStateException();
+            }
+            if (dequeue == null) {
+                throw new UnsupportedOperationException();
+            }
+
+            if (previousNode == null) {
+                dequeue.head = nextNode;
+            }
+            else {
+                previousNode.next = nextNode;
+            }
+
+            if (nextNode == null) {
+                dequeue.tail = previousNode;
+            }
+            dequeue.size--;
+            if (dequeue.isEmpty()) {
+                dequeue.tail = null;
+            }
+
+            lastReturned = null;
+            canRemove = false;
         }
     }
 }
