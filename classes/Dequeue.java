@@ -1,5 +1,6 @@
 package classes;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 /**
@@ -10,7 +11,7 @@ import java.util.NoSuchElementException;
  * @author Jonathan Ganun (jsganun)
  * @version 11/6/2026
  */
-public class Dequeue<T> {
+public class Dequeue<T> implements Iterable<T> {
     private Node<T> head;
     private Node<T> tail;
     private int size;
@@ -117,6 +118,16 @@ public class Dequeue<T> {
     }
 
     /**
+     * Returns an iterator over the elements in this queue, from front to back.
+     *
+     * @return an iterator over this queue
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new DequeueIterator<T>(head);
+    }
+
+    /**
      * Finds the index of the first element equal to the specified object.
      *
      * @param obj the object to find
@@ -194,6 +205,42 @@ public class Dequeue<T> {
         public Node(E dataPortion, Node<E> nextNode) {
             data = dataPortion;
             next = nextNode;
+        }
+    }
+
+    /**
+     * Iterates over the elements in a linked queue.
+     *
+     * @param <E> the type of element returned by the iterator
+     */
+    public static class DequeueIterator<E>
+        implements Iterator<E> {
+
+        private Node<E> nextNode;
+
+        /**
+         * Creates an iterator beginning at the specified node.
+         *
+         * @param head the first node to visit
+         */
+        public DequeueIterator(Node<E> head) {
+            nextNode = head;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextNode != null;
+        }
+
+        @Override
+        public E next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+
+            E data = nextNode.data;
+            nextNode = nextNode.next;
+            return data;
         }
     }
 }
